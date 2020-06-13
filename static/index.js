@@ -1,50 +1,76 @@
-const updateDisplay = () => {
-        // Ensure user is added
-    if (!localStorage.getItem("username"))
-    {
-        document.querySelector("#chatbox").style.display = "none";
-        document.querySelector("#loginbox").style.display = "block";  
-        console.log('chatbox is not visible'); 
 
-    } else {
-        document.querySelector("#loginbox").style.display = "none";
-        document.querySelector("#chatbox").style.display = "block";
-        const showuser = document.querySelector("#showuser");
-        showuser.innerHTML = localStorage.getItem("username");
-        console.log('loginbox is not visible');
-
-        // //Display current channels
-        // messages.forEach(msg => {
-        //     const li = document.createElement('li');
-        //     li.innerHTML = `${msg['username']} said: ${msg['message']} at ${msg['timestamp']}`;
-        //     document.querySelector('#channelMessages').append(li);
-        // });
-
-        // // Join a channel if a user was in that particular channel before leaving & display channel messages
-        // const username = localStorage.getItem("username");
-        // const channel = localStorage.getItem("channel");
-        // const selection = localStorage.getItem("channel");
-        // socket.emit('change channel', {'username': username, 'channel': channel, 'selection': selection});
-    }
-    console.log('socket is connected'); 
-};
 
 //TEST TEST
 // localStorage.setItem('username': 'harios');
 // localStorage.setItem('channel': 'main');
 
 document.addEventListener('DOMContentLoaded', () => {
-    updateDisplay();
+    
     //This is project2 Friday
     // Connect to websocket
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
-    // socket.on('connect', () => {
-    //     /* Connect socket */
-    //     //request channels to load
-    //     socket.emit('load channels')
+    const updateDisplay = () => {
+        // Ensure user is added
+            const username = localStorage.getItem("username");
+            const channel = localStorage.getItem("channel");
 
-    // });
+            if (!username)
+            {
+                document.querySelector("#chatbox").style.display = "none";
+                document.querySelector("#loginbox").style.display = "block";  
+                console.log('chatbox is not visible'); 
+
+            } else {
+                document.querySelector("#loginbox").style.display = "none";
+                document.querySelector("#chatbox").style.display = "block";
+                const showuser = document.querySelector("#showuser");
+                showuser.innerHTML = username;
+                console.log('loginbox is not visible');
+
+
+                socket.emit('chatbox state', {'username': username, 'channel': channel});
+
+                // //Display current channels
+                // messages.forEach(msg => {
+                //     const li = document.createElement('li');
+                //     li.innerHTML = `${msg['username']} said: ${msg['message']} at ${msg['timestamp']}`;
+                //     document.querySelector('#channelMessages').append(li);
+                // });
+
+                // // Join a channel if a user was in that particular channel before leaving & display channel messages
+                // const username = localStorage.getItem("username");
+                // const channel = localStorage.getItem("channel");
+                // const selection = localStorage.getItem("channel");
+                // socket.emit('change channel', {'username': username, 'channel': channel, 'selection': selection});
+            }
+            console.log('socket is connected'); 
+        };
+
+    socket.on('connect', () => {
+        /* Connect socket */
+        //request channels to load
+        updateDisplay();
+
+    });
+
+    socket.on('load state', data => {
+        const channels = data.channels;
+        const selection = data.channel;
+            //Display current channels
+        channels.forEach(channel => {
+            const li = document.createElement('li');
+            li.innerHTML = channel;
+            li.className = "joinChannel";
+            li.dataset.channel = channel;
+            document.querySelector('#chatboxChannels').append(li);
+            
+        });
+
+            //Enter channel
+        socket.emit('change channel', {'username': username, 'channel': '', 'selection': selection});  //selection or channel is null, should erase this argument
+
+    });
 
     document.querySelector('#login').onsubmit = () => {
         const username = document.querySelector("#username").value;
@@ -74,8 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const username = localStorage.getItem("username");
         const channel = localStorage.getItem("channel");
         localStorage.clear();
-        // localStorage.removeItem("username");
-        // localStorage.removeItem("channel");
         socket.emit('log out', {'username': username, 'channel': channel});
         updateDisplay();
     }

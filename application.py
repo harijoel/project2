@@ -26,11 +26,16 @@ def login(data):
     username = data["username"]
     #Username constraints
     if len(username) < 1:  #AT LEAST   ONE CHARACTER
-        print("username was below 1")
+        print("Could not log in: username was below 1")
         return
+
+    if not username.isalnum():  #ONLY LETTERS AND NUMBERS
+        print("Could not log in: username is not a word")
+        return
+
     for key in channels:   #UNIQE
         if username in channels[key].users:
-            print("username was already there")
+            print("Could not log in: username was already there")
             return
 
     c = channels["main"]
@@ -50,7 +55,7 @@ def logout(data):
         c = channels[channel]
         c.rem_user(username)
     except:
-        print("could not log out")
+        print("could not log out -or- already logged out")
         return
 
 @socketio.on("new channel")
@@ -94,8 +99,9 @@ def changeChannel(data):
     username = data["username"]
 
     #Remove user from old channel
-    c = channels[oldchannel]
-    c.rem_user(username)
+    if oldchannel != '':
+        c = channels[oldchannel]
+        c.rem_user(username)
 
     #Add user to new channel
     c = channels[channel]
@@ -105,4 +111,11 @@ def changeChannel(data):
     print(messages)
 
     emit("join channel", {"channel": channel, "messages": messages})
+
+
+@socketio.on("chatbox state")
+def chatboxState(data):
+    channelList = list(channels)
+    channel = data["channel"]
+    emit("load state", {"channels": channelList, "channel": channel})
 
