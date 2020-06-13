@@ -47,33 +47,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // });
 
     document.querySelector('#login').onsubmit = () => {
-        // const username = document.querySelector("#username").value;
-        // socket.emit('log in', {'username': username});
-        // console.log(`${username} wants to log in`);
-        // document.querySelector("username").value = '';
-        // return false;
-
-        console.log('username is being submited');
         const username = document.querySelector("#username").value;
-        localStorage.setItem('username', username);
-        localStorage.setItem('channel', 'main');
         socket.emit('log in', {'username': username});
-        updateDisplay();
+        console.log(`${username} wants to log in`);
+        document.querySelector("#username").value = '';
         return false;
+        console.log('should not see this');
+
+        // console.log('username is being submited');
+        // const username = document.querySelector("#username").value;
+        // localStorage.setItem('username', username);
+        // localStorage.setItem('channel', 'main');
+        // socket.emit('log in', {'username': username});
+        // updateDisplay();
+        // return false;
     };
 
-    // socket.on('logged in', data => {
-    //     localStorage.setItem('username', data.username);
-    //     localStorage.setItem('channel', 'main');
-    //     updateDisplay();
-    //     console.log(`${username} logged in`);
-    // });
+    socket.on('logged in', data => {
+        localStorage.setItem('username', data.username);
+        localStorage.setItem('channel', 'main');
+        updateDisplay();
+        console.log(`${data.username} logged in`);
+    });
 
     document.querySelector('#logout').onclick = () => {
         const username = localStorage.getItem("username");
         const channel = localStorage.getItem("channel");
-        localStorage.removeItem("username");
-        localStorage.removeItem("channel");
+        localStorage.clear();
+        // localStorage.removeItem("username");
+        // localStorage.removeItem("channel");
         socket.emit('log out', {'username': username, 'channel': channel});
         updateDisplay();
     }
@@ -119,17 +121,21 @@ document.addEventListener('DOMContentLoaded', () => {
     };
         // When a new channel is created, add to the unordered list
     socket.on('add channel', data => {
-        console.log("channel was ever added 1")
+        
+          // Vainilla JS implemantation
         const li = document.createElement('li');
         li.innerHTML = data.channel;
         li.className = "joinChannel";
         li.dataset.channel = data.channel;
         document.querySelector('#chatboxChannels').append(li);
-          // Handlebars implementation
+
+        //   Handlebars implementation
         // const template = Handlebars.compile(document.querySelector('#channelTemp').innerHTML);
         // const content = template({'channelName': data.channel});
-        // document.querySelector('#chatboxChannels') += content;
+        // document.querySelector('#chatboxChannels').innerHTML += content;
         // console.log("channel was ever added 2")
+
+        console.log(`${data.channel} channel was added`);
     });
 
     document.addEventListener('click', function(e){

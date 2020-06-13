@@ -35,16 +35,23 @@ def login(data):
 
     c = channels["main"]
     c.add_user(username)
+    print(c.users)
     emit("logged in", {"username": username})
     print(f"{username} wants to log in")
 
 @socketio.on("log out")
 def logout(data):
-    username = data["username"]
-    channel = data["channel"]
-    c = channels[channel]
-    c.rem_user(username)
-
+    #Error catching if already deleted
+    print("log out attempt")
+    try:
+        username = data["username"]
+        channel = data["channel"]
+        print(f"{username} tried to log out from {channel}")
+        c = channels[channel]
+        c.rem_user(username)
+    except:
+        print("could not log out")
+        return
 
 @socketio.on("new channel")
 def newChannel(data):
