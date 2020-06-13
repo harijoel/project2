@@ -1,12 +1,9 @@
-
-
-//TEST TEST
+//TEST TEST: SATURDAY
 // localStorage.setItem('username': 'harios');
 // localStorage.setItem('channel': 'main');
 
 document.addEventListener('DOMContentLoaded', () => {
     
-    //This is project2 Friday
     // Connect to websocket
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
@@ -19,14 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
             {
                 document.querySelector("#chatbox").style.display = "none";
                 document.querySelector("#loginbox").style.display = "block";  
-                console.log('chatbox is not visible'); 
+                console.log('login is visible'); 
 
             } else {
                 document.querySelector("#loginbox").style.display = "none";
                 document.querySelector("#chatbox").style.display = "block";
                 const showuser = document.querySelector("#showuser");
                 showuser.innerHTML = username;
-                console.log('loginbox is not visible');
+                console.log('chatbox is visible');
 
 
                 socket.emit('chatbox state', {'username': username, 'channel': channel});
@@ -49,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     socket.on('connect', () => {
         /* Connect socket */
-        //request channels to load
+        //load necesary components
         updateDisplay();
 
     });
@@ -68,25 +65,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
             //Enter channel
-        socket.emit('change channel', {'username': username, 'channel': '', 'selection': selection});  //selection or channel is null, should erase this argument
-
+        socket.emit('change channel', {'username': username, 'channel': '', 'selection': selection}); 
+        console.log('state is loaded');
     });
 
     document.querySelector('#login').onsubmit = () => {
         const username = document.querySelector("#username").value;
         socket.emit('log in', {'username': username});
-        console.log(`${username} wants to log in`);
         document.querySelector("#username").value = '';
+        console.log(`${username} wants to log in`);
         return false;
-        console.log('should not see this');
-
-        // console.log('username is being submited');
-        // const username = document.querySelector("#username").value;
-        // localStorage.setItem('username', username);
-        // localStorage.setItem('channel', 'main');
-        // socket.emit('log in', {'username': username});
-        // updateDisplay();
-        // return false;
     };
 
     socket.on('logged in', data => {
@@ -102,35 +90,33 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.clear();
         socket.emit('log out', {'username': username, 'channel': channel});
         updateDisplay();
+        console.log(`${username} logged out and left ${channel}`);
     }
 
         // Send button should emit a "submit message" event
     document.querySelector('#sendMessage').onsubmit = () => {
         const channel = localStorage.getItem("channel");
-        console.log(channel);
         const username = localStorage.getItem("username");
-        console.log(username);
         const message = document.querySelector('#msg').value;
-        console.log(message);
         // Send: channel, username, text message
         socket.emit('submit message', {'channel': channel, 'username': username, 'message': message});
         // Clear input field
         document.querySelector('#msg').value = '';
-        console.log('message sent')
-
+        console.log(`${username} said: --${message}-- from ${channel}`);
         return false;
     };
 
         // When a new message is announced, add to the unordered list
     socket.on('announce message', data => {
-        const channel = data.channel
+        const channel = data.channel;
         if (localStorage.getItem("channel") === channel) {
-            console.log(data.channel);
             const li = document.createElement('li');
             li.innerHTML = `${data.username} said: ${data.message} at ${data.timestamp}`;
             document.querySelector('#channelMessages').append(li);
-        }
-        
+            console.log("you SEE this message");
+        } else {
+            console.log("you DON'T SEE this message");
+        };
     });
 
         //Request a new channel to be created
@@ -139,8 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.emit('new channel', {'channel': channel});
         // Clear input field
         document.querySelector('#channelName').value = '';
-        console.log("addChannel");
-
+        console.log(`${channel} channel wants to be added`);
         return false;
     };
         // When a new channel is created, add to the unordered list
@@ -162,38 +147,35 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(`${data.channel} channel was added`);
     });
 
+        //  Add event to dynamicaly generated elements
     document.addEventListener('click', function(e){
-        if (e.target && e.target.classList.contains("joinChannel")){
+        if (e.target && e.target.classList.contains("joinChannel")) {
             console.log(`${e.target.dataset.channel} was clicked`);
             const selection = e.target.dataset.channel;  //new channel
             const username = localStorage.getItem("username");
             const channel = localStorage.getItem("channel");  //old current channel
-            console.log(`${username} wants to join ${selection} channel from ${channel} channel`);
             socket.emit('change channel', {'username': username, 'channel': channel, 'selection': selection});
-        }
+            console.log(`${username} wants to join ${selection} channel from ${channel} channel`);
+        };
     });
     
 
     socket.on('join channel', data => {
         const channel = data.channel;
         const messages = data.messages;
-
+        //Replace or current channel value
         localStorage.setItem('channel', channel);
-
         //Hide old channel messages
         document.querySelector('#channelMessages').innerHTML = '';
         console.log(messages)
-
         //Display new channel messages
         messages.forEach(msg => {
             const li = document.createElement('li');
             li.innerHTML = `${msg['username']} said: ${msg['message']} at ${msg['timestamp']}`;
             document.querySelector('#channelMessages').append(li);
         });
-
-
-        
-    })
+        console.log(`you joined ${channel} channel`);        
+    });
 
 
 
