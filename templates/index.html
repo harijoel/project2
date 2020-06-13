@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block heading %}
+    Lioa Liao!
+{% endblock %}
+
+{% block body %}
+<div id="loginbox">
+    <div class="container">
+      <div class="row mt-5">
+
+        <div class="col-lg-7 mx-auto">
+        <div class="card text-center">
+          <div class="card-header">
+            <h3>Log in</h3>
+          </div>
+
+          <div class="card-body">
+            <form id="login">
+              <div class="form-group mt-4">
+                <input name="username" id="username" autocomplete="off" autofocus class="form-control" placeholder="Username" type="text">
+              </div>
+              <button class="btn btn-primary btn-block" type=submit>Log in</button>
+            </form>
+          </div>
+
+        </div>
+        </div>
+
+      </div>
+    </div>
+</div>
+
+
+
+<div id="chatbox">
+    <div class="row">
+        <div class="chatboxMain col-10">
+            <div class="card">
+                <div class="card-header">
+                    Chat now!
+                </div>
+                <div class="card-body">
+                    <ul id="channelMessages">
+                        
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <form id="sendMessage">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span id='emj' class="input-group-text">😎</span>
+                            </div>
+                            <input class='form-control' id="msg" autocomplete="off" placeholder='Your message' autofocus/>
+                            <div class="input-group-append">
+                                <button type="submit" class='btn ml-1 mr-1 btn-secondary'>Send</button>
+                                <button class='btn mr-1 btn-secondary'>Attach</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="chatboxSide col-2">
+            <div class="card">
+                <div class="card-header">
+                    Channels
+                </div>
+                <div class="card-body">
+                    <form id="addChannel">
+                        <input type="text" name="channelName" id="channelName" autocomplete="off" placeholder="new channel">
+                        <button type="submit" class="btn btn-primary">Add</button>
+                    </form>
+                    <div id="chatboxChannels" class="list-group">
+                        <button type="button" class="list-group-item list-group-item-action active joinChannel" id="c-main" data-channel="main">main</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
