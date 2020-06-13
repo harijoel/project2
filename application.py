@@ -24,8 +24,19 @@ def index():
 @socketio.on("log in")
 def login(data):
     username = data["username"]
+    #Username constraints
+    if len(username) < 1:  #AT LEAST   ONE CHARACTER
+        print("username was below 1")
+        return
+    for key in channels:   #UNIQE
+        if username in channels[key].users:
+            print("username was already there")
+            return
+
     c = channels["main"]
     c.add_user(username)
+    emit("logged in", {"username": username})
+    print(f"{username} wants to log in")
 
 @socketio.on("log out")
 def logout(data):
@@ -39,8 +50,10 @@ def logout(data):
 def newChannel(data):
     #Get data of new channel
     channel = data["channel"]
-    #Make sure channel doesn't already exist  ######## This may not work early, potential bug
-    if channel in channels.keys():
+    #Channel name constraints
+    if len(channel) < 1:  #AT LEAST   ONE CHARACTER
+        return
+    if channel in channels.keys():  #UNIQE
         return
     #Create new channel object and append
     c = Channel(channel)
@@ -54,9 +67,12 @@ def message(data):
     channel = data["channel"]
     username = data["username"]
     message = data["message"]
-    timestamp = int(time.time())
+    #Message constraints
+    if len(message) < 1:  #AT LEAST   ONE CHARACTER
+        return
 
     m = Message(user = username, message = message)
+    timestamp = m.timestamp
     c = channels[channel]
     c.add_message(m)
     emit("announce message", {"channel": channel, "username": username, "message": message, "timestamp": timestamp}, broadcast=True)

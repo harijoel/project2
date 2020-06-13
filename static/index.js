@@ -29,7 +29,9 @@ const updateDisplay = () => {
     console.log('socket is connected'); 
 };
 
-
+//TEST TEST
+// localStorage.setItem('username': 'harios');
+// localStorage.setItem('channel': 'main');
 
 document.addEventListener('DOMContentLoaded', () => {
     updateDisplay();
@@ -45,6 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // });
 
     document.querySelector('#login').onsubmit = () => {
+        // const username = document.querySelector("#username").value;
+        // socket.emit('log in', {'username': username});
+        // console.log(`${username} wants to log in`);
+        // document.querySelector("username").value = '';
+        // return false;
+
         console.log('username is being submited');
         const username = document.querySelector("#username").value;
         localStorage.setItem('username', username);
@@ -53,6 +61,13 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDisplay();
         return false;
     };
+
+    // socket.on('logged in', data => {
+    //     localStorage.setItem('username', data.username);
+    //     localStorage.setItem('channel', 'main');
+    //     updateDisplay();
+    //     console.log(`${username} logged in`);
+    // });
 
     document.querySelector('#logout').onclick = () => {
         const username = localStorage.getItem("username");

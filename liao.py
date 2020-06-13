@@ -14,7 +14,7 @@ class Channel:
 		self.users.remove(user)
 
 	def add_message(self, message):
-		self.messages.appendleft(message)
+		self.messages.append(message)
 
 	def list_messages(self):
 		m = []
