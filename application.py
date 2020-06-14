@@ -75,7 +75,6 @@ def newChannel(data):
 
 @socketio.on("submit message")
 def message(data):
-    print("OMAEWA")
     channel = data["channel"]
     username = data["username"]
     message = data["message"]
@@ -106,6 +105,7 @@ def changeChannel(data):
     #Add user to new channel
     c = channels[channel]
     c.add_user(username)
+
     #Get new channel messages
     messages = c.list_messages()
     print(messages)
@@ -115,7 +115,11 @@ def changeChannel(data):
 
 @socketio.on("chatbox state")
 def chatboxState(data):
+    #Get all existing channels
     channelList = list(channels)
+    #Get user's last channel
     channel = data["channel"]
-    emit("load state", {"channels": channelList, "channel": channel})
+    # #Get channel's online users
+    # userList = channels[channel].users
+    emit("load state", {"channels": channelList, "channel": channel, "users": ''})
 

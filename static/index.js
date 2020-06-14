@@ -1,6 +1,16 @@
 //TEST TEST: SATURDAY
 // localStorage.setItem('username': 'harios');
 // localStorage.setItem('channel': 'main');
+function formatAMPM(date) {
+  var hours = date.getHours();
+  var minutes = date.getMinutes();
+  var ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0'+minutes : minutes;
+  var strTime = hours + ':' + minutes + ' ' + ampm;
+  return strTime;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -54,6 +64,10 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('load state', data => {
         const channels = data.channels;
         const selection = data.channel;
+        //const users = data.users;
+
+        // console.log('users online:');
+        // console.log(users);
             //Display current channels
         channels.forEach(channel => {
             const li = document.createElement('li');
@@ -61,8 +75,14 @@ document.addEventListener('DOMContentLoaded', () => {
             li.className = "joinChannel";
             li.dataset.channel = channel;
             document.querySelector('#chatboxChannels').append(li);
-            
         });
+
+        //     //Display current channel online users
+        // users.forEach(user => {
+        //     const li = document.createElement('li');
+        //     li.innerHTML = user;
+        //     document.querySelector('#chatboxUsers').append(li);
+        // });
 
             //Enter channel
         socket.emit('change channel', {'username': username, 'channel': '', 'selection': selection}); 
@@ -111,7 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const channel = data.channel;
         if (localStorage.getItem("channel") === channel) {
             const li = document.createElement('li');
-            li.innerHTML = `${data.username} said: ${data.message} at ${data.timestamp}`;
+            //Convert epoch to local time
+            const timestamp = formatAMPM(new Date(data.timestamp * 1000));
+
+            li.innerHTML = `${data.username} said: ${data.message} at ${timestamp}`;
             document.querySelector('#channelMessages').append(li);
             console.log("you SEE this message");
         } else {
@@ -163,6 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('join channel', data => {
         const channel = data.channel;
         const messages = data.messages;
+        const users = data.users;
         //Replace or current channel value
         localStorage.setItem('channel', channel);
         //Hide old channel messages
@@ -171,9 +195,14 @@ document.addEventListener('DOMContentLoaded', () => {
         //Display new channel messages
         messages.forEach(msg => {
             const li = document.createElement('li');
-            li.innerHTML = `${msg['username']} said: ${msg['message']} at ${msg['timestamp']}`;
+            //Convert epoch to local time
+            const timestamp = formatAMPM(new Date(msg['timestamp'] * 1000));
+
+            li.innerHTML = `${msg['username']} said: ${msg['message']} at ${timestamp}`;
             document.querySelector('#channelMessages').append(li);
         });
+
+
         console.log(`you joined ${channel} channel`);        
     });
 
