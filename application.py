@@ -76,6 +76,17 @@ def newChannel(data):
     emit("add channel", {"channel": channel}, broadcast=True)
 
 
+@socketio.on("user step")
+def userStep(data):
+    username = data["username"]
+    channel = data["channel"]
+    step = data["step"]
+    if step == "enter":
+        emit("addrem user", {"username": username, "channel": channel, "step": 'enter'}, broadcast=True)
+    else:
+        emit("addrem user", {"username": username, "channel": channel, "step": 'leave'}, broadcast=True)
+
+
 @socketio.on("submit message")
 def message(data):
     channel = data["channel"]
@@ -112,7 +123,7 @@ def changeChannel(data):
         print(f"user joined to {c.name}")
         print(c.users)
 
-        emit("join channel", {"channel": channel})
+        emit("join channel", {"channel": channel, "username": username})
 
 
 @socketio.on("chatbox state")

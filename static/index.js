@@ -33,6 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.querySelector("#chatbox").style.display = "block";
                 const showuser = document.querySelector("#showuser");
                 showuser.innerHTML = username;
+                const currentChannel = document.querySelector("#currentChannel");
+                currentChannel.innerHTML = channel;
                 console.log('chatbox is visible');
 
                 console.log("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
@@ -102,12 +104,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('#chatboxUsers').innerHTML = '';
         users.forEach(user => {
             const li = document.createElement('li');
+            li.id = `user-${user}`;
             li.innerHTML = user;
             document.querySelector('#chatboxUsers').append(li);
         });
 
         console.log('state is loaded');
     });
+
 
     document.querySelector('#login').onsubmit = () => {
         const username = document.querySelector("#username").value;
@@ -120,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('logged in', data => {
         localStorage.setItem('username', data.username);
         localStorage.setItem('channel', 'main');
+        socket.emit('user step', {'username': data.username, 'channel': 'main', 'step': 'enter'});
         updateDisplay();
         console.log(`${data.username} logged in`);
     });
@@ -129,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const channel = localStorage.getItem("channel");
         localStorage.clear();
         socket.emit('log out', {'username': username, 'channel': channel});
+        socket.emit('user step', {'username': username, 'channel': channel, 'step': 'leave'});
         updateDisplay();
         console.log(`${username} logged out and left ${channel}`);
     }
@@ -190,6 +196,29 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(`${data.channel} channel was added`);
     });
 
+    socket.on('addrem user', data => {
+        const step = data.step;
+        const channel = data.channel;
+        const username = data.username;
+
+        if ( localStorage.getItem("channel") === channel && username !== localStorage.getItem("username") )  {
+            if (step == "enter") {
+                //add user to online list
+                const li = document.createElement('li');
+                li.innerHTML = username;
+                li.className = "channelUser";
+                li.dataset.channel = username;
+                li.id = `user-${username}`;
+                document.querySelector('#chatboxUsers').append(li);
+            } else {
+                //remove user from online list
+                document.querySelector(`#user-${username}`).style.display = "none";
+            };
+        };
+        
+        
+    })
+
         //  Add event to dynamicaly generated elements
     document.addEventListener('click', function(e){
         if (e.target && e.target.classList.contains("joinChannel")) {
@@ -198,17 +227,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const username = localStorage.getItem("username");
             const channel = localStorage.getItem("channel");  //old current channel
             socket.emit('change channel', {'username': username, 'channel': channel, 'selection': selection});
+            socket.emit('user step', {'username': username, 'channel': channel, 'step': 'leave'});
             console.log(`${username} wants to join ${selection} channel from ${channel} channel`);
         };
     });
     
-
+        //  Change current channel and update
     socket.on('join channel', data => {
         const channel = data.channel;
+        const username = data.username;
+        
         //Replace or current channel value
         localStorage.setItem('channel', channel);
-        updateDisplay()
-
+        socket.emit('user step', {'username': username, 'channel': channel, 'step': 'enter'});
+        updateDisplay();
         console.log(`you joined ${channel} channel`);        
     });
 
