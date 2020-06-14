@@ -201,20 +201,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const channel = data.channel;
         const username = data.username;
 
-        if ( localStorage.getItem("channel") === channel && username !== localStorage.getItem("username") )  {
-            if (step == "enter") {
-                //add user to online list
-                const li = document.createElement('li');
-                li.innerHTML = username;
-                li.className = "channelUser";
-                li.dataset.channel = username;
-                li.id = `user-${username}`;
-                document.querySelector('#chatboxUsers').append(li);
-            } else {
-                //remove user from online list
-                document.querySelector(`#user-${username}`).style.display = "none";
-            };
-        };
+        // if ( localStorage.getItem("channel") === channel && username !== localStorage.getItem("username") )  {
+        //     if (step == "enter") {
+        //         //add user to online list
+        //         const li = document.createElement('li');
+        //         li.innerHTML = username;
+        //         li.className = "channelUser";
+        //         li.dataset.channel = username;
+        //         li.id = `user-${username}`;
+        //         document.querySelector('#chatboxUsers').append(li);
+        //     } else {
+        //         //remove user from online list
+        //         document.querySelector(`#user-${username}`).style.display = "none";
+        //     };
+        // };
+        
+        updateDisplay();
         
         
     })
