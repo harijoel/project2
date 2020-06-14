@@ -39,7 +39,7 @@ def login(data):
             return
 
     c = channels["main"]
-    #c.add_user(username)
+    c.add_user(username)
     emit("logged in", {"username": username})
     print(f"{username} wants to log in")
     print(f"{username} joined {c.name}")
@@ -107,15 +107,12 @@ def changeChannel(data):
         print(c.users)
 
         #Add user to new channel
-    c = channels[channel]
-    c.add_user(username)
-    print(f"user joined to {c.name}")
-    print(c.users)
+        c = channels[channel]
+        c.add_user(username)
+        print(f"user joined to {c.name}")
+        print(c.users)
 
-    #Get new channel messages
-    messages = c.list_messages()
-
-    emit("join channel", {"channel": channel, "messages": messages})
+        emit("join channel", {"channel": channel})
 
 
 @socketio.on("chatbox state")
@@ -124,7 +121,12 @@ def chatboxState(data):
     channelList = list(channels)
     #Get user's last channel
     channel = data["channel"]
-    # #Get channel's online users
-    # userList = channels[channel].users
-    emit("load state", {"channels": channelList, "channel": channel, "users": ''})
+    print(f"{channel} WWWWWWWWWWWWWWWWWWWWWW")
+    #Get channel's messages
+    c = channels[channel]
+    messages = c.list_messages()
+    #Get channel's online users
+    userList = c.users
+
+    emit("load state", {"channels": channelList, "channel": channel, "messages": messages, "users": userList})
 

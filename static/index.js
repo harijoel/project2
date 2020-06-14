@@ -13,7 +13,7 @@ function formatAMPM(date) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    
+    //localStorage.setItem('channel', 'main');
     // Connect to websocket
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showuser.innerHTML = username;
                 console.log('chatbox is visible');
 
-
+                console.log("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
                 socket.emit('chatbox state', {'username': username, 'channel': channel});
 
                 // //Display current channels
@@ -66,11 +66,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const selection = data.channel;
         const channel = localStorage.getItem("channel"); //WW
         const username = localStorage.getItem("username");
+        const messages = data.messages;
+        const users = data.users;
         //const users = data.users;
 
         // console.log('users online:');
         // console.log(users);
+
+
+        //Hide old channel messages
+        document.querySelector('#channelMessages').innerHTML = '';
+        console.log(messages)
+        //Display new channel messages
+        messages.forEach(msg => {
+            const li = document.createElement('li');
+            //Convert epoch to local time
+            const timestamp = formatAMPM(new Date(msg['timestamp'] * 1000));
+
+            li.innerHTML = `${msg['username']} said: ${msg['message']} at ${timestamp}`;
+            document.querySelector('#channelMessages').append(li);
+        });
+
+
             //Display current channels
+        document.querySelector('#chatboxChannels').innerHTML = '';
         channels.forEach(channel => {
             const li = document.createElement('li');
             li.innerHTML = channel;
@@ -79,15 +98,14 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('#chatboxChannels').append(li);
         });
 
-        //     //Display current channel online users
-        // users.forEach(user => {
-        //     const li = document.createElement('li');
-        //     li.innerHTML = user;
-        //     document.querySelector('#chatboxUsers').append(li);
-        // });
+            //Display current channel online users
+        document.querySelector('#chatboxUsers').innerHTML = '';
+        users.forEach(user => {
+            const li = document.createElement('li');
+            li.innerHTML = user;
+            document.querySelector('#chatboxUsers').append(li);
+        });
 
-            //Enter channel
-        socket.emit('change channel', {'username': username, 'channel': channel, 'selection': selection}); 
         console.log('state is loaded');
     });
 
@@ -187,23 +205,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     socket.on('join channel', data => {
         const channel = data.channel;
-        const messages = data.messages;
-        const users = data.users;
         //Replace or current channel value
         localStorage.setItem('channel', channel);
-        //Hide old channel messages
-        document.querySelector('#channelMessages').innerHTML = '';
-        console.log(messages)
-        //Display new channel messages
-        messages.forEach(msg => {
-            const li = document.createElement('li');
-            //Convert epoch to local time
-            const timestamp = formatAMPM(new Date(msg['timestamp'] * 1000));
-
-            li.innerHTML = `${msg['username']} said: ${msg['message']} at ${timestamp}`;
-            document.querySelector('#channelMessages').append(li);
-        });
-
+        updateDisplay()
 
         console.log(`you joined ${channel} channel`);        
     });
