@@ -99,8 +99,8 @@ def changeChannel(data):
     channel = data["selection"]
     username = data["username"]
 
-    #Remove user from old channel
-    if oldchannel != '':
+    #Remove user from previous channel
+    if oldchannel != channel:
         c = channels[oldchannel]
         c.rem_user(username)
         print(f"user left from {c.name}")

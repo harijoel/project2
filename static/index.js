@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('load state', data => {
         const channels = data.channels;
         const selection = data.channel;
+        const channel = localStorage.getItem("channel"); //WW
         const username = localStorage.getItem("username");
         //const users = data.users;
 
@@ -86,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // });
 
             //Enter channel
-        socket.emit('change channel', {'username': username, 'channel': '', 'selection': selection}); 
+        socket.emit('change channel', {'username': username, 'channel': channel, 'selection': selection}); 
         console.log('state is loaded');
     });
 
