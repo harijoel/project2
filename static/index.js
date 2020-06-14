@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('load state', data => {
         const channels = data.channels;
         const selection = data.channel;
+        const username = localStorage.getItem("username");
         //const users = data.users;
 
         // console.log('users online:');
