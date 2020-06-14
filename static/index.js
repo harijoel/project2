@@ -124,8 +124,8 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('logged in', data => {
         localStorage.setItem('username', data.username);
         localStorage.setItem('channel', 'main');
-        socket.emit('user step', {'username': data.username, 'channel': 'main', 'step': 'enter'});
         updateDisplay();
+        socket.emit('user step', {'username': data.username, 'channel': 'main', 'step': 'enter'});
         console.log(`${data.username} logged in`);
     });
 
@@ -134,8 +134,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const channel = localStorage.getItem("channel");
         localStorage.clear();
         socket.emit('log out', {'username': username, 'channel': channel});
-        socket.emit('user step', {'username': username, 'channel': channel, 'step': 'leave'});
         updateDisplay();
+        socket.emit('user step', {'username': username, 'channel': channel, 'step': 'leave'});
         console.log(`${username} logged out and left ${channel}`);
     }
 
@@ -215,8 +215,13 @@ document.addEventListener('DOMContentLoaded', () => {
         //         document.querySelector(`#user-${username}`).style.display = "none";
         //     };
         // };
-        
-        updateDisplay();
+
+        if ( localStorage.getItem("channel") === channel && username !== localStorage.getItem("username") ) {
+            console.log("UPDATE DISPLAY");
+            updateDisplay();
+        }
+
+        // updateDisplay();
         
         
     })
@@ -241,8 +246,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         //Replace or current channel value
         localStorage.setItem('channel', channel);
-        socket.emit('user step', {'username': username, 'channel': channel, 'step': 'enter'});
         updateDisplay();
+        socket.emit('user step', {'username': username, 'channel': channel, 'step': 'enter'});
         console.log(`you joined ${channel} channel`);        
     });
 
