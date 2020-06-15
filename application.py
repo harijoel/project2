@@ -9,8 +9,6 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 socketio = SocketIO(app)
 
 
-
-
 #Chat global variables
 channels = {}
 #Add default channel
@@ -60,6 +58,8 @@ def logout(data):
         c.rem_user(username)
         print(f"user left {c.name}")
         print(c.users)
+        #emit("logged out", {"username": username, "channel": channel})
+        emit("addrem user", {"username": username, "channel": channel, "step": 'leave'}, broadcast=True)
     except:
         print("could not log out -or- already logged out")
         return

@@ -28,5 +28,3 @@ class Message:
 		self.user = user
 		self.message = message
 		self.timestamp = int(time.time())
-
-#may not need a user class, could make finding users in channel harder because it is a pointer and not a string

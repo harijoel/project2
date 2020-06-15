@@ -61,18 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 socket.emit('chatbox state', {'username': username, 'channel': channel});
 
-                // //Display current channels
-                // messages.forEach(msg => {
-                //     const li = document.createElement('li');
-                //     li.innerHTML = `${msg['username']} said: ${msg['message']} at ${msg['timestamp']}`;
-                //     document.querySelector('#channelMessages').append(li);
-                // });
-
-                // // Join a channel if a user was in that particular channel before leaving & display channel messages
-                // const username = localStorage.getItem("username");
-                // const channel = localStorage.getItem("channel");
-                // const selection = localStorage.getItem("channel");
-                // socket.emit('change channel', {'username': username, 'channel': channel, 'selection': selection});
             }
             console.log('socket is connected'); 
         };
@@ -105,32 +93,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // console.log('users online:');
         // console.log(users);
 
-
-        //Hide old channel messages
+            //Hide old channel messages
         document.querySelector('#channelMessages').innerHTML = '';
         console.log(messages)
-        //Display new channel messages
+            //Display new channel messages
         messages.forEach(msg => {
-            // const li = document.createElement('li');
-            // //Convert epoch to local time
-            // const timestamp = formatAMPM(new Date(msg['timestamp'] * 1000));
-
-            // li.innerHTML = `${msg['username']} said: ${msg['message']} at ${timestamp}`;
-            // document.querySelector('#channelMessages').append(li);
-
             displayMessage(msg);
         });
 
-
-            //Display current channels
+            //Hide old channels
         document.querySelector('#chatboxChannels').innerHTML = '';
+            //Display current channels
         channels.forEach(channel => {
-            // const li = document.createElement('li');
-            // li.innerHTML = channel;
-            // li.className = "joinChannel";
-            // li.dataset.channel = channel;
-            // document.querySelector('#chatboxChannels').append(li);
-
             displayChannel(channel);
 
         });
@@ -173,12 +147,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#logout').onclick = () => {
         const username = localStorage.getItem("username");
         const channel = localStorage.getItem("channel");
-        localStorage.clear();
         socket.emit('log out', {'username': username, 'channel': channel});
-        socket.emit('user step', {'username': username, 'channel': channel, 'step': 'leave'});
-        updateDisplay();
-        console.log(`${username} logged out and left ${channel}`);
+        //socket.emit('user step', {'username': username, 'channel': channel, 'step': 'leave'});
+        localStorage.clear();
+        //updateDisplay();
     }
+
+    socket.on('logged out', data => {
+        
+        updateDisplay();
+        console.log(`${data.username} logged out and left ${data.channel}`);
+        socket.emit('user step', {'username': username, 'channel': channel, 'step': 'leave'});
+    })
 
         // Send button should emit a "submit message" event
     document.querySelector('#sendMessage').onsubmit = () => {
@@ -197,22 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('announce message', data => {
         const channel = data.channel;
         if (localStorage.getItem("channel") === channel) {
-            // const li = document.createElement('li');
-            // //Convert epoch to local time
-            // const timestamp = formatAMPM(new Date(data.timestamp * 1000));
-
-            // li.innerHTML = `${data.username} said: ${data.message} at ${timestamp}`;
-            // document.querySelector('#channelMessages').append(li);
-            // console.log("you SEE this message");
-
-
-            // const li = document.createElement('li');
-            // //Convert epoch to local time
-            // const timestamp = formatAMPM(new Date(msg['timestamp'] * 1000));
-
-            // li.innerHTML = `${msg['username']} said: ${msg['message']} at ${timestamp}`;
-            // document.querySelector('#channelMessages').append(li);
-
             displayMessage(data);
         } else {
             console.log("you DON'T SEE this message");
@@ -230,29 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
         // When a new channel is created, add to the unordered list
     socket.on('add channel', data => {
-        
-        //   // Vainilla JS implemantation
-        // const li = document.createElement('li');
-        // li.innerHTML = data.channel;
-        // li.className = "joinChannel";
-        // li.dataset.channel = data.channel;
-        // document.querySelector('#chatboxChannels').append(li);
-
-        //   // Vainilla JS but using links and Bootstrap
-        // const a = document.createElement('a');
-        // a.innerHTML = data.channel;
-        // a.className = "list-group-item list-group-item-action joinChannel";
-        // a.dataset.channel = data.channel;
-        // document.querySelector('#chatboxChannels').append(a);
-
-            // Function implementation
         displayChannel(data.channel);
-
-        //   // Handlebars implementation
-        // const template = Handlebars.compile(document.querySelector('#channelTemp').innerHTML);
-        // const content = template({'channelName': data.channel});
-        // document.querySelector('#chatboxChannels').innerHTML += content;
-        // console.log("channel was ever added 2");
 
         console.log(`${data.channel} channel was added`);
     });
@@ -289,9 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
         //     updateDisplay();
         // };
 
-        // updateDisplay();
-        
-        
+        // updateDisplay();     
     });
 
         //  Add event to dynamicaly generated elements
@@ -324,4 +264,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 });
-
