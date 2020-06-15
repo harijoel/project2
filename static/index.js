@@ -12,6 +12,28 @@ function formatAMPM(date) {
   return strTime;
 }
 
+function displayChannel(channel) {
+   // Vainilla JS but using links and Bootstrap
+    const a = document.createElement('a');
+    a.innerHTML = channel;
+    a.className = "list-group-item list-group-item-action joinChannel";
+    a.dataset.channel = channel;
+    document.querySelector('#chatboxChannels').append(a);
+}
+
+function displayMessage(msg) {
+    const li = document.createElement('li');
+    //Convert epoch to local time
+    const timestamp = formatAMPM(new Date(msg['timestamp'] * 1000));
+    li.innerHTML = `<div class="row">
+                        <div class="col-6 text-left text-primary">${msg['username']}:</div>
+                        <div class="col-6 text-right text-muted">${timestamp}</div>
+                    </div>
+                    <dvi class="text-left">${msg['message']}</dvi>`;
+    li.className = "list-group-item";
+    document.querySelector('#channelMessages').prepend(li);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     //localStorage.setItem('channel', 'main');
     // Connect to websocket
@@ -37,7 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentChannel.innerHTML = channel;
                 console.log('chatbox is visible');
 
-                console.log("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
                 socket.emit('chatbox state', {'username': username, 'channel': channel});
 
                 // //Display current channels
@@ -63,6 +84,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     });
 
+    socket.on('disconnect', () => {
+        /* Connect socket */
+        //load necesary components
+        const username = localStorage.getItem("username");
+        const channel = localStorage.getItem("channel");
+        socket.emit('user step', {'username': username, 'channel': channel, 'step': 'leave'});
+
+    });
+
     socket.on('load state', data => {
         const channels = data.channels;
         const selection = data.channel;
@@ -81,23 +111,28 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(messages)
         //Display new channel messages
         messages.forEach(msg => {
-            const li = document.createElement('li');
-            //Convert epoch to local time
-            const timestamp = formatAMPM(new Date(msg['timestamp'] * 1000));
+            // const li = document.createElement('li');
+            // //Convert epoch to local time
+            // const timestamp = formatAMPM(new Date(msg['timestamp'] * 1000));
 
-            li.innerHTML = `${msg['username']} said: ${msg['message']} at ${timestamp}`;
-            document.querySelector('#channelMessages').append(li);
+            // li.innerHTML = `${msg['username']} said: ${msg['message']} at ${timestamp}`;
+            // document.querySelector('#channelMessages').append(li);
+
+            displayMessage(msg);
         });
 
 
             //Display current channels
         document.querySelector('#chatboxChannels').innerHTML = '';
         channels.forEach(channel => {
-            const li = document.createElement('li');
-            li.innerHTML = channel;
-            li.className = "joinChannel";
-            li.dataset.channel = channel;
-            document.querySelector('#chatboxChannels').append(li);
+            // const li = document.createElement('li');
+            // li.innerHTML = channel;
+            // li.className = "joinChannel";
+            // li.dataset.channel = channel;
+            // document.querySelector('#chatboxChannels').append(li);
+
+            displayChannel(channel);
+
         });
 
             //Display current channel online users
@@ -105,11 +140,17 @@ document.addEventListener('DOMContentLoaded', () => {
         users.forEach(user => {
             const li = document.createElement('li');
             li.id = `user-${user}`;
+            li.className = "channelUser";
             li.innerHTML = user;
             document.querySelector('#chatboxUsers').append(li);
         });
 
         console.log('state is loaded');
+    });
+
+    socket.on('alert', data => {
+        const message = data.message;
+        alert(`Oops! ${message}`);
     });
 
 
@@ -134,8 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const channel = localStorage.getItem("channel");
         localStorage.clear();
         socket.emit('log out', {'username': username, 'channel': channel});
-        updateDisplay();
         socket.emit('user step', {'username': username, 'channel': channel, 'step': 'leave'});
+        updateDisplay();
         console.log(`${username} logged out and left ${channel}`);
     }
 
@@ -156,13 +197,23 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('announce message', data => {
         const channel = data.channel;
         if (localStorage.getItem("channel") === channel) {
-            const li = document.createElement('li');
-            //Convert epoch to local time
-            const timestamp = formatAMPM(new Date(data.timestamp * 1000));
+            // const li = document.createElement('li');
+            // //Convert epoch to local time
+            // const timestamp = formatAMPM(new Date(data.timestamp * 1000));
 
-            li.innerHTML = `${data.username} said: ${data.message} at ${timestamp}`;
-            document.querySelector('#channelMessages').append(li);
-            console.log("you SEE this message");
+            // li.innerHTML = `${data.username} said: ${data.message} at ${timestamp}`;
+            // document.querySelector('#channelMessages').append(li);
+            // console.log("you SEE this message");
+
+
+            // const li = document.createElement('li');
+            // //Convert epoch to local time
+            // const timestamp = formatAMPM(new Date(msg['timestamp'] * 1000));
+
+            // li.innerHTML = `${msg['username']} said: ${msg['message']} at ${timestamp}`;
+            // document.querySelector('#channelMessages').append(li);
+
+            displayMessage(data);
         } else {
             console.log("you DON'T SEE this message");
         };
@@ -180,18 +231,28 @@ document.addEventListener('DOMContentLoaded', () => {
         // When a new channel is created, add to the unordered list
     socket.on('add channel', data => {
         
-          // Vainilla JS implemantation
-        const li = document.createElement('li');
-        li.innerHTML = data.channel;
-        li.className = "joinChannel";
-        li.dataset.channel = data.channel;
-        document.querySelector('#chatboxChannels').append(li);
+        //   // Vainilla JS implemantation
+        // const li = document.createElement('li');
+        // li.innerHTML = data.channel;
+        // li.className = "joinChannel";
+        // li.dataset.channel = data.channel;
+        // document.querySelector('#chatboxChannels').append(li);
 
-        //   Handlebars implementation
+        //   // Vainilla JS but using links and Bootstrap
+        // const a = document.createElement('a');
+        // a.innerHTML = data.channel;
+        // a.className = "list-group-item list-group-item-action joinChannel";
+        // a.dataset.channel = data.channel;
+        // document.querySelector('#chatboxChannels').append(a);
+
+            // Function implementation
+        displayChannel(data.channel);
+
+        //   // Handlebars implementation
         // const template = Handlebars.compile(document.querySelector('#channelTemp').innerHTML);
         // const content = template({'channelName': data.channel});
         // document.querySelector('#chatboxChannels').innerHTML += content;
-        // console.log("channel was ever added 2")
+        // console.log("channel was ever added 2");
 
         console.log(`${data.channel} channel was added`);
     });
@@ -200,31 +261,38 @@ document.addEventListener('DOMContentLoaded', () => {
         const step = data.step;
         const channel = data.channel;
         const username = data.username;
+        console.log(`${username} has ${step} the channel ${channel}`);
 
-        // if ( localStorage.getItem("channel") === channel && username !== localStorage.getItem("username") )  {
-        //     if (step == "enter") {
-        //         //add user to online list
-        //         const li = document.createElement('li');
-        //         li.innerHTML = username;
-        //         li.className = "channelUser";
-        //         li.dataset.channel = username;
-        //         li.id = `user-${username}`;
-        //         document.querySelector('#chatboxUsers').append(li);
-        //     } else {
-        //         //remove user from online list
-        //         document.querySelector(`#user-${username}`).style.display = "none";
-        //     };
+        if ( localStorage.getItem("channel") === channel && username !== localStorage.getItem("username") )  {
+            if (step == "enter") {
+                //add user to online list
+                const li = document.createElement('li');
+                li.innerHTML = username;
+                li.className = "channelUser";
+                li.dataset.channel = username;
+                li.id = `user-${username}`;
+                document.querySelector('#chatboxUsers').append(li);
+            } else {
+                // //remove user from online list
+                // document.querySelector(`#user-${username}`).style.display = "none";
+                const users = document.querySelectorAll('.channelUser')
+                users.forEach(user => {
+                    if (user.id === `user-${username}`) {
+                        user.style.display = "none";
+                    };
+                });
+            };
+        };
+
+        // if ( localStorage.getItem("channel") === channel && localStorage.getItem("username") !== username ) {
+        //     console.log("UPDATE DISPLAY");
+        //     updateDisplay();
         // };
-
-        if ( localStorage.getItem("channel") === channel && username !== localStorage.getItem("username") ) {
-            console.log("UPDATE DISPLAY");
-            updateDisplay();
-        }
 
         // updateDisplay();
         
         
-    })
+    });
 
         //  Add event to dynamicaly generated elements
     document.addEventListener('click', function(e){
@@ -234,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const username = localStorage.getItem("username");
             const channel = localStorage.getItem("channel");  //old current channel
             socket.emit('change channel', {'username': username, 'channel': channel, 'selection': selection});
-            socket.emit('user step', {'username': username, 'channel': channel, 'step': 'leave'});
+            
             console.log(`${username} wants to join ${selection} channel from ${channel} channel`);
         };
     });
@@ -243,10 +311,12 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('join channel', data => {
         const channel = data.channel;
         const username = data.username;
+        const oldchannel = data.oldchannel;
         
         //Replace or current channel value
         localStorage.setItem('channel', channel);
         updateDisplay();
+        socket.emit('user step', {'username': username, 'channel': oldchannel, 'step': 'leave'});
         socket.emit('user step', {'username': username, 'channel': channel, 'step': 'enter'});
         console.log(`you joined ${channel} channel`);        
     });

@@ -27,15 +27,18 @@ def login(data):
     #Username constraints
     if len(username) < 1:  #AT LEAST   ONE CHARACTER
         print("Could not log in: username was below 1")
+        emit("alert", {"message": "You didn't type a username!"})
         return
 
     if not username.isalnum():  #ONLY LETTERS AND NUMBERS
         print("Could not log in: username is not a word")
+        emit("alert", {"message": "Your username is not a word!"})
         return
 
     for key in channels:   #UNIQE
         if username in channels[key].users:
             print("Could not log in: username was already there")
+            emit("alert", {"message": "Someone is alredy using that username!"})
             return
 
     c = channels["main"]
@@ -69,6 +72,7 @@ def newChannel(data):
     if len(channel) < 1:  #AT LEAST   ONE CHARACTER
         return
     if channel in channels.keys():  #UNIQE
+        emit("alert", {"message": "Channel already exists"})
         return
     #Create new channel object and append
     c = Channel(channel)
@@ -123,7 +127,7 @@ def changeChannel(data):
         print(f"user joined to {c.name}")
         print(c.users)
 
-        emit("join channel", {"channel": channel, "username": username})
+        emit("join channel", {"channel": channel, "username": username, "oldchannel": oldchannel})
 
 
 @socketio.on("chatbox state")

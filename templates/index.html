@@ -33,18 +33,18 @@
 
 
 
-<div id="chatbox" style="height: 90%">
+<div id="chatbox" class="px-4 mt-4">
     <div class="row">
         <div class="chatboxMain col-10">
             <div class="card">
                 <div class="card-header">
-                    Chat now! <span id="currentChannel"></span>
+                    Chat now! <span id="currentChannel" class="h4"></span>
                 </div>
-                <div class="card-body">
-                    <ul id="channelMessages">
+                <!-- <div class="card-body" id="messagesContainer"> -->
+                    <ul id="channelMessages" class="list-group">
                         
                     </ul>
-                </div>
+                <!-- </div> -->
                 <div class="card-footer">
                     <form id="sendMessage">
                         <div class="input-group">
@@ -64,34 +64,42 @@
         <div class="chatboxSide col-2">
 
             <div class="row">
-                <div class="card" id="channelbox">
-                    <div class="card-header">
-                        Channels
-                    </div>
-                    <div class="card-body">
-                        <form id="addChannel">
-                            <input type="text" name="channelName" id="channelName" autocomplete="off" placeholder="new channel">
-                            <button type="submit" class="btn btn-primary">Add</button>
-                        </form>
-                        <!-- channel list goes here -->
-                        <div id="chatboxChannels" class="list-group">
-                            
+
+                <div class="col-12">
+                    <div class="card" id="channelbox">
+                        <div class="card-header">
+                            Channels
+                        </div>
+                        <div class="card-body">
+                            <form id="addChannel">
+                                <input type="text" name="channelName" id="channelName" autocomplete="off" placeholder="new channel">
+                                <button type="submit" class="btn btn-primary">Add</button>
+                            </form>
+                            <!-- channel list goes here -->
+                            <div id="chatboxChannels" class="list-group">
+                                
+                            </div>
                         </div>
                     </div>
                 </div>
+                <div class="col-12">
+                    <div class="card" id="userbox">
+                        <div class="card-header">
+                            Users
+                        </div>
+                        <div class="card-body">
+                            <!-- user list goes here -->
+                            <div id="chatboxUsers" class="list-group">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
             </div> <!-- end channels row -->
 
             <div class="row">
-                <div class="card" id="userbox">
-                    <div class="card-header">
-                        Users
-                    </div>
-                    <div class="card-body">
-                        <!-- user list goes here -->
-                        <div id="chatboxUsers" class="list-group">
-                        </div>
-                    </div>
-                </div>
+                
             </div> <!-- end users row -->
             
         </div>

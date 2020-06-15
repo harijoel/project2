@@ -10,8 +10,6 @@
 
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
 
-    <!-- Custom JS -->
-    <script src="{{ url_for('static', filename='index.js') }}"></script>
 
    <!--  Handlebars and templates -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
@@ -20,14 +18,39 @@
           {{  channelName  }}
       </button>
     </script>
+
+
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='index.js') }}"></script>
+
+
     <title>{% block heading %}{% endblock %}</title>
     <style>
+
+      html, body
+      {
+          height: 100%;
+      }
+
       #chatbox {
         display: none;
       }
       #loginbox {
         display: none;
       }
+
+      .joinChannel {
+        cursor: pointer;
+      }
+
+      #channelMessages {
+        overflow-y: auto;
+        height: 62vh;
+        display: flex;
+        flex-direction: column-reverse;
+      }
+
+      
 
     </style>
   </head>
