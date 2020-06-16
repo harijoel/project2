@@ -80,6 +80,14 @@ def newChannel(data):
     emit("add channel", {"channel": channel}, broadcast=True)
 
 
+@socketio.on("disconnected")
+def disconected(data):
+    username = data["username"]
+    channel = data["channel"]
+    print(f"{username} has DISCONNECTED")
+    emit("addrem user", {"username": username, "channel": channel, "step": 'leave'}, broadcast=True)
+
+
 @socketio.on("user step")
 def userStep(data):
     username = data["username"]
@@ -134,6 +142,8 @@ def changeChannel(data):
 def chatboxState(data):
     #Get all existing channels
     channelList = list(channels)
+    # #Get user
+    # username = data["username"]
     #Get user's last channel
     channel = data["channel"]
     print(f"{channel} WWWWWWWWWWWWWWWWWWWWWW")

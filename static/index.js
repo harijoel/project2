@@ -70,21 +70,36 @@ document.addEventListener('DOMContentLoaded', () => {
         //load necesary components
         updateDisplay();
 
+        // socket.on('disconnect', () => {
+        //     /* Connect socket */
+        //     //load necesary components
+        //     const username = localStorage.getItem("username");
+        //     const channel = localStorage.getItem("channel");
+        //     socket.emit('disconnected', {'username': username, 'channel': channel});
+    
+        // });
+
     });
+
+    window.onbeforeunload = function () {
+        const username = localStorage.getItem("username");
+        const channel = localStorage.getItem("channel");
+        socket.emit('disconnected', {'username': username, 'channel': channel});
+    };
 
     socket.on('disconnect', () => {
         /* Connect socket */
         //load necesary components
         const username = localStorage.getItem("username");
         const channel = localStorage.getItem("channel");
-        socket.emit('user step', {'username': username, 'channel': channel, 'step': 'leave'});
+        socket.emit('disconnected', {'username': username, 'channel': channel});
 
     });
 
     socket.on('load state', data => {
         const channels = data.channels;
         const selection = data.channel;
-        const channel = localStorage.getItem("channel"); //WW
+        const channel = localStorage.getItem("channel"); 
         const username = localStorage.getItem("username");
         const messages = data.messages;
         const users = data.users;
@@ -118,6 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
             li.innerHTML = user;
             document.querySelector('#chatboxUsers').append(li);
         });
+
+        //socket.emit('user step', {'username': data.username, 'channel': channel, 'step': 'enter'});   //NEW LINE 6/15
 
         console.log('state is loaded');
     });
